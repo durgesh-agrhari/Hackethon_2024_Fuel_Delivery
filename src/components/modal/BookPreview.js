@@ -57,19 +57,19 @@ function BookPreview({
                   <div className="text-[24px] text-black font-semibold">
                     <p>Petrol : </p>
                     <p className="text-[24px] font-thin">
-                      Total : {petrolPrice} ₹/L ( Quantity: {petrolQuantity} L)
+                      Total : {petrolPrice} ₹ ( Quantity: {petrolQuantity} L)
                     </p>
                   </div>
                   <div className="text-[24px] text-black font-semibold">
                     <p>Diesel : </p>
                     <p className="text-[24px] font-thin">
-                      Total : {dieselPrice} ₹/L ( Quantity: {dieselQuantity} L)
+                      Total : {dieselPrice} ₹ ( Quantity: {dieselQuantity} L)
                     </p>
                   </div>
                   <div className="text-[24px] text-black font-semibold">
                     <p>Delivery Charge ({deliveryCharge} per km) : </p>
                     <p className="text-[24px] font-thin">
-                      Total Distance : {distance} / km <br />
+                      Total Distance : {distance} km <br />
                       Delivery Charge : {totalDeliveryCharge}
                     </p>
                   </div>
