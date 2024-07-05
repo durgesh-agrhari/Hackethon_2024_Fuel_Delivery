@@ -46,6 +46,7 @@ function ListOrder({ order, setLoading }) {
         (response) => {
           toast.error(response.data.message);
           setLoading(true);
+          navigate("/seller");
         },
         (error) => {
           // console.log(error.response);
@@ -62,6 +63,7 @@ function ListOrder({ order, setLoading }) {
         (response) => {
           toast.success(response.data.message);
           setLoading(true);
+          navigate("/seller");
         },
         (error) => {
           // console.log(error.response);
@@ -78,6 +80,7 @@ function ListOrder({ order, setLoading }) {
         (response) => {
           toast.info(response.data.message);
           setLoading(true);
+          navigate("/seller");
         },
         (error) => {
           // console.log(error.response);

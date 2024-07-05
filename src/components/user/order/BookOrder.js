@@ -4,24 +4,24 @@ import authService from "../../../services/auth.service";
 import LoginLight from "../../../assets/images/loginLight.jpg";
 import Modal from "../../modal/Modal";
 import { getDistance } from "geolib";
-import {BsFuelPump} from "react-icons/bs"
+import { BsFuelPump } from "react-icons/bs";
 import BookPreview from "../../modal/BookPreview";
 import { toast } from "react-toastify";
 function BookOrder() {
   const { id } = useParams();
   const [station, setStation] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showOrderModal,setShowOrderModal] = useState(false);
-  const [userInfo,setUserInfo] = useState(null);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const [address, setAddress] = useState(null);
-  const [petrolQuantity,setPetrolQuantity] = useState(0)
-  const [petrolPrice,setPetrolPrice] = useState(0)
+  const [petrolQuantity, setPetrolQuantity] = useState(0);
+  const [petrolPrice, setPetrolPrice] = useState(0);
 
-  const [dieselQuantity,setDieselQuantity] = useState(0)
-  const [dieselPrice,setDieselPrice] = useState(0)
+  const [dieselQuantity, setDieselQuantity] = useState(0);
+  const [dieselPrice, setDieselPrice] = useState(0);
 
-  const [totalPrice,setTotalPrice] = useState(0);
-  const [transactionData,setTransactionData] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [transactionData, setTransactionData] = useState(null);
 
   const [method, setMethod] = useState();
   const navigate = useNavigate();
@@ -66,81 +66,82 @@ function BookOrder() {
     // console.log(user);
   }, [user]);
 
-  useEffect(()=>{
+  useEffect(() => {
     // console.log(transactionData)
-    if(transactionData){
-      if(transactionData.msg === "Success"){
-        const updatedMethod = {"online" : {
-          ...method.online,
-          transactionID : transactionData.paymentId,
-          status : 'success'
-        }}
-        postOrder(updatedMethod); 
+    if (transactionData) {
+      if (transactionData.msg === "Success") {
+        const updatedMethod = {
+          online: {
+            ...method.online,
+            transactionID: transactionData.paymentId,
+            status: "success",
+          },
+        };
+        postOrder(updatedMethod);
         setMethod(updatedMethod);
-      }else{
-        toast.error(transactionData.msg)
+      } else {
+        toast.error(transactionData.msg);
       }
       setTransactionData(null);
     }
-  },[transactionData])
-  
+  }, [transactionData]);
+
   useEffect(() => {
     getResposne();
     setMethod({
-      cash : totalPrice
-    })
+      cash: totalPrice,
+    });
   }, []);
 
-  useEffect(()=>{
-    if(petrolQuantity !== "" && station){
-      return setPetrolPrice(petrolQuantity * station.quantity.petrol.price)
+  useEffect(() => {
+    if (petrolQuantity !== "" && station) {
+      return setPetrolPrice(petrolQuantity * station.quantity.petrol.price);
     }
     setPetrolQuantity(0);
-  },[petrolQuantity])
+  }, [petrolQuantity]);
 
-  useEffect(()=>{
-    if(dieselQuantity !== "" && station){
-      return setDieselPrice(dieselQuantity * station.quantity.diesel.price)
+  useEffect(() => {
+    if (dieselQuantity !== "" && station) {
+      return setDieselPrice(dieselQuantity * station.quantity.diesel.price);
     }
     setDieselQuantity(0);
-  },[dieselQuantity])
+  }, [dieselQuantity]);
 
-  const proceedOrder =  (e) =>{
-      e.preventDefault();
-      setShowOrderModal(false)
-      if(method.online){
-       authService.displayRazorpay(totalPrice,setTransactionData)
-      }else{
-        postOrder(method);
-      }
-  } 
-  const postOrder = async (method) => {
-    const fuel  = {
+  const proceedOrder = (e) => {
+    e.preventDefault();
+    setShowOrderModal(false);
+    if (method.online) {
+      authService.displayRazorpay(totalPrice, setTransactionData);
+    } else {
+      postOrder(method);
     }
-    
-    if(petrolQuantity ){
+  };
+  const postOrder = async (method) => {
+    const fuel = {};
+
+    if (petrolQuantity) {
       const petrol = {
-        "price" : petrolPrice,
-        "quantity" : petrolQuantity
-      }
+        price: petrolPrice,
+        quantity: petrolQuantity,
+      };
       fuel.petrol = petrol;
     }
-    if(dieselPrice ){
-      const diesel =  {
-        "price" : dieselPrice,
-        "quantity" : dieselQuantity
-      }
+    if (dieselPrice) {
+      const diesel = {
+        price: dieselPrice,
+        quantity: dieselQuantity,
+      };
       fuel.diesel = diesel;
     }
     try {
-      await authService.postOrder(user.userId, id, address,fuel, method).then(
+      await authService.postOrder(user.userId, id, address, fuel, method).then(
         (response) => {
-          if(response.data.order){
-           toast.success("Order Placed Successfully")
-           navigate('/user/')
-           return;
+          if (response.data.order) {
+            toast.success("Order Placed Successfully");
+            navigate("/user/");
+            return;
           }
-          toast.warning("Some Issue Detected")
+          toast.warning("Some Issue Detected");
         },
         (error) => {
           toast.error(error.response.data.message);
@@ -156,23 +157,23 @@ function BookOrder() {
 
   const renderedInfo = station ? (
     <div className="flex flex-col">
-    <div className="flex flex-row gap-3 items-center">
-      <BsFuelPump className="text-[#fe6f2b] text-[54px]"/>
-      <h1 className="text-center text-[54px] font-bold">
-        {station.name}
-      </h1>
-    </div>
-      <div className="flex flex-row items-center">
-          <label className="text-[24px] font-semibold">Petrol: </label>
-          <p className="text-[24px] font-thin">
-          {station.quantity.petrol.price} ₹/L (Total Quantity : {station.quantity.petrol.quantity} L)
-          </p>
+      <div className="flex flex-row gap-3 items-center">
+        <BsFuelPump className="text-[#fe6f2b] text-[54px]" />
+        <h1 className="text-center text-[54px] font-bold">{station.name}</h1>
       </div>
       <div className="flex flex-row items-center">
-          <label className="text-[24px] font-semibold">Diesel: </label>
-          <p className="text-[24px] font-thin">
-          {station.quantity.diesel.price} ₹/L (Total Quantity : {station.quantity.diesel.quantity} L)
-          </p>
+        <label className="text-[24px] font-semibold">Petrol: </label>
+        <p className="text-[24px] font-thin">
+          {station.quantity.petrol.price} ₹/L (Total Quantity :{" "}
+          {station.quantity.petrol.quantity} L)
+        </p>
+      </div>
+      <div className="flex flex-row items-center">
+        <label className="text-[24px] font-semibold">Diesel: </label>
+        <p className="text-[24px] font-thin">
+          {station.quantity.diesel.price} ₹/L (Total Quantity :{" "}
+          {station.quantity.diesel.quantity} L)
+        </p>
       </div>
     </div>
   ) : null;
@@ -191,7 +192,7 @@ function BookOrder() {
       </div>
       <div className="flex flex-row text-white  justify-evenly items-center  gap-5 lg:flex-row flex-wrap lg:gap-10 lg:w-[30%] ">
         <div className="header">
-          <h1 className="text-center text-[54px]">Book Order</h1>
+          <h1 className="text-center text-[54px]">Place Order</h1>
           <p></p>
         </div>
         <form className="w-full max-w-sm" onSubmit={onHandleSubmit}>
@@ -199,7 +200,7 @@ function BookOrder() {
             <div className="">
               <label
                 className="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4"
-               htmlFor="inline-currentPassword"
+                htmlFor="inline-currentPassword"
               >
                 Address
               </label>
@@ -231,7 +232,7 @@ function BookOrder() {
             <div className="">
               <label
                 className="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4"
-               htmlFor="inline-newPassword"
+                htmlFor="inline-newPassword"
               >
                 Petrol
               </label>
@@ -242,11 +243,10 @@ function BookOrder() {
                 id="inline-newPassword"
                 type="number"
                 onChange={(e) => {
-                  if(e.target.value > station.quantity.petrol.quantity){
-                    toast.warning("Quantity Not Available")
-                  }
-                  else{
-                  setPetrolQuantity(e.target.value)
+                  if (e.target.value > station.quantity.petrol.quantity) {
+                    toast.warning("Quantity Not Available");
+                  } else {
+                    setPetrolQuantity(e.target.value);
                   }
                 }}
                 value={petrolQuantity}
@@ -260,7 +260,7 @@ function BookOrder() {
                 type="number"
                 readOnly
                 onChange={(e) => {
-                  setPetrolPrice(e.target.value)
+                  setPetrolPrice(e.target.value);
                 }}
                 value={petrolPrice}
                 placeholder="Price"
@@ -271,7 +271,7 @@ function BookOrder() {
             <div className="">
               <label
                 className="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4"
-               htmlFor="inline-diesel"
+                htmlFor="inline-diesel"
               >
                 Diesel
               </label>
@@ -282,10 +282,10 @@ function BookOrder() {
                 id="inline-diesel"
                 type="number"
                 onChange={(e) => {
-                  if(e.target.value > station.quantity.diesel.quantity){
-                    toast.warning("Quantity Not Available")
-                  }else{
-                  setDieselQuantity(e.target.value)
+                  if (e.target.value > station.quantity.diesel.quantity) {
+                    toast.warning("Quantity Not Available");
+                  } else {
+                    setDieselQuantity(e.target.value);
                   }
                 }}
                 value={dieselQuantity}
@@ -303,20 +303,21 @@ function BookOrder() {
               />
             </div>
           </div>
-           
+
           <div className="actions w-full flex flex-col gap-4">
-            <button className="bg-[#fe6f2b] hover:bg-[#F59337] w-full text-white font-bold py-2 px-4 rounded-full"
-            onClick={(e)=>{
-              e.preventDefault();
-              if(!address){
-                return toast.warning("Please Fill In address");
-              }
-              if(petrolQuantity || dieselQuantity){
-              setShowOrderModal(!showOrderModal)
-              }else{
-                toast.warning("Please Fill In some Quantity");
-              }
-            }}
+            <button
+              className="bg-[#fe6f2b] hover:bg-[#F59337] w-full text-white font-bold py-2 px-4 rounded-full"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!address) {
+                  return toast.warning("Please Fill In address");
+                }
+                if (petrolQuantity || dieselQuantity) {
+                  setShowOrderModal(!showOrderModal);
+                } else {
+                  toast.warning("Please Fill In some Quantity");
+                }
+              }}
             >
               Order
             </button>
@@ -330,14 +331,23 @@ function BookOrder() {
               Cancel
             </button>
           </div>
-          {
-            showOrderModal?
-            <BookPreview address={address} method={method} totalPrice={totalPrice} setTotalPrice={setTotalPrice} setMethod={setMethod} order={station} user={userInfo} petrolPrice={petrolPrice} petrolQuantity={petrolQuantity} dieselQuantity={dieselQuantity} dieselPrice={dieselPrice}  setOnCancel={setShowOrderModal} 
-            setOnProceed={
-              proceedOrder
-            }/>
-            :null
-        }
+          {showOrderModal ? (
+            <BookPreview
+              address={address}
+              method={method}
+              totalPrice={totalPrice}
+              setTotalPrice={setTotalPrice}
+              setMethod={setMethod}
+              order={station}
+              user={userInfo}
+              petrolPrice={petrolPrice}
+              petrolQuantity={petrolQuantity}
+              dieselQuantity={dieselQuantity}
+              dieselPrice={dieselPrice}
+              setOnCancel={setShowOrderModal}
+              setOnProceed={proceedOrder}
+            />
+          ) : null}
         </form>
       </div>
     </div>

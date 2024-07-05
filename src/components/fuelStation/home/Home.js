@@ -83,7 +83,7 @@ function Home() {
                 className="flex items-center justify-center  w-[200px] h-[100px] bg-gray-100 rounded-lg shadow hover:bg-[#fe6f2b]"
               >
                 <h5 className="mb-2 lg:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                  Order Fuel
+                  Pending Orders
                 </h5>
               </Link>
             </div>
